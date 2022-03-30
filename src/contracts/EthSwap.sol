@@ -8,7 +8,14 @@ contract EthSwap {
     Token public token;
     uint256 public rate = 100;
 
-    event TokenPurchased(
+    event TokensPurchased(
+        address account,
+        address token,
+        uint256 amout,
+        uint256 rate
+    );
+
+    event TokensSold(
         address account,
         address token,
         uint256 amout,
@@ -20,12 +27,23 @@ contract EthSwap {
     }
 
     function buyTokens() public payable {
-      uint256 tokenAmount = msg.value * rate;
+        uint256 tokenAmount = msg.value * rate;
 
-      require(token.balanceOf(address(this)) >= tokenAmount);
+        require(token.balanceOf(address(this)) >= tokenAmount);
 
-      token.transfer(msg.sender, tokenAmount);
+        token.transfer(msg.sender, tokenAmount);
 
-      emit TokenPurchased(msg.sender, address(token), tokenAmount, rate);
+        emit TokensPurchased(msg.sender, address(token), tokenAmount, rate);
+    }
+
+    function sellTokens(uint256 _amout) public {
+        uint256 etherAmount = _amout / rate;
+
+        require(address(this).balance >= etherAmount);
+
+        token.transferFrom(msg.sender, address(this), _amout);
+        payable(msg.sender).transfer(etherAmount);
+
+        emit TokensSold(msg.sender, address(token), _amout, rate);
     }
 }

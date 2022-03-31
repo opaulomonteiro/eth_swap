@@ -1,13 +1,19 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Web3 from "web3";
-import "./App.css";
 
+import EthSwap from "../abis/EthSwap.json";
+import Token from "../abis/Token.json";
 import Navbar from "./Navbar/Navbar";
+
+import "./App.css";
 
 const App = () => {
   const [account, setAccount] = useState("");
   const [web3, setWeb3] = useState();
   const [ethBalance, setEthBalance] = useState(0);
+  const [token, setToken] = useState();
+  const [ethSwap, setEthSwap] = useState();
+  const [tokenBalance, setTokenBalance] = useState(0);
 
   const loadWeb3 = async () => {
     if (window.ethereum) {
@@ -24,6 +30,32 @@ const App = () => {
     }
   };
 
+  const loadToken = async (networkId) => {
+    const tokenData = Token.networks[networkId];
+    if (tokenData) {
+      setToken(new web3.eth.Contract(Token.abi, tokenData.address));
+      if (token) {
+        const balance = await token.methods.balanceOf(account).call();
+        setTokenBalance(balance.toString());
+      }
+    } else {
+      window.alert("Token contract not deployed to detected network.");
+    }
+  };
+
+  const loadEthSwap = async (networkId) => {
+    const ethSwapData = EthSwap.networks[networkId];
+    if (ethSwapData) {
+      const ethSwapContract = new web3.eth.Contract(
+        EthSwap.abi,
+        ethSwapData.address
+      );
+      setEthSwap(ethSwapContract);
+    } else {
+      window.alert("Token contract not deployed to detected network.");
+    }
+  };
+
   const fetchData = useCallback(async () => {
     if (web3) {
       const accounts = await web3.eth.getAccounts();
@@ -32,6 +64,9 @@ const App = () => {
         const balance = await web3.eth.getBalance(account);
         setEthBalance(balance);
       }
+      const networkId = await web3.eth.net.getId();
+      await loadToken(networkId);
+      await loadEthSwap(networkId);
     }
   }, [web3, account, ethBalance]);
 

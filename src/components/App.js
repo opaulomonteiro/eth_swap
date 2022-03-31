@@ -5,7 +5,7 @@ import "./App.css";
 import Navbar from "./Navbar/Navbar";
 
 const App = () => {
-  const [account, setAccount] = useState('');
+  const [account, setAccount] = useState("");
   const [web3, setWeb3] = useState();
   const [ethBalance, setEthBalance] = useState(0);
 
@@ -28,9 +28,10 @@ const App = () => {
     if (web3) {
       const accounts = await web3.eth.getAccounts();
       setAccount(accounts[0]);
-
-      const balance = await web3.eth.getBalance(account);
-      setEthBalance(balance);
+      if (account) {
+        const balance = await web3.eth.getBalance(account);
+        setEthBalance(balance);
+      }
     }
   }, [web3, account, ethBalance]);
 
@@ -44,7 +45,7 @@ const App = () => {
 
   return (
     <div>
-      <Navbar account={account}/>
+      <Navbar account={account} />
       <div className="container-fluid mt-5">
         <div className="row">
           <main role="main" className="col-lg-12 d-flex text-center">

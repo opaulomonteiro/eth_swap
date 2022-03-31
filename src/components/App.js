@@ -4,6 +4,7 @@ import Web3 from "web3";
 import EthSwap from "../abis/EthSwap.json";
 import Token from "../abis/Token.json";
 import Navbar from "./Navbar/Navbar";
+import Main from "./Main";
 
 import "./App.css";
 
@@ -14,6 +15,7 @@ const App = () => {
   const [token, setToken] = useState();
   const [ethSwap, setEthSwap] = useState();
   const [tokenBalance, setTokenBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const loadWeb3 = async () => {
     if (window.ethereum) {
@@ -67,6 +69,7 @@ const App = () => {
       const networkId = await web3.eth.net.getId();
       await loadToken(networkId);
       await loadEthSwap(networkId);
+      setLoading(false);
     }
   }, [web3, account, ethBalance]);
 
@@ -81,13 +84,29 @@ const App = () => {
   return (
     <div>
       <Navbar account={account} />
-      <div className="container-fluid mt-5">
+      <div className="container mt-5">
         <div className="row">
-          <main role="main" className="col-lg-12 d-flex text-center">
-            <div className="content mr-auto ml-auto">
-              <h1>Hello World</h1>
-            </div>
+          <main
+            role="main"
+            className="col-lg-12 ml-auto mr-auto"
+            style={{ maxWidth: "400px" }}
+          >
+            <div className="content mr-auto ml-auto"></div>
           </main>
+          {loading ? (
+            <p id="loader" className="text-center">
+              Loading...
+            </p>
+          ) : (
+            <Main
+              account={account}
+              ethBalance={ethBalance}
+              tokenBalance={tokenBalance}
+              ethSwap={ethSwap}
+              token={token}
+              setLoading={setLoading}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -1,1 +1,7 @@
 /* Styles go here */
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
